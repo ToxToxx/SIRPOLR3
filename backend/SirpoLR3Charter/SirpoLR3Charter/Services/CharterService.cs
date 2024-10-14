@@ -43,6 +43,18 @@ namespace SirpoLR3Charter.Services
         {
             return await _context.Charters.ToListAsync();
         }
-    
+
+        public async Task DeleteCharter(Guid id)
+        {
+            var charter = await _context.Charters.FindAsync(id);
+            if (charter == null)
+            {
+                return;
+            }
+
+            _context.Charters.Remove(charter);
+            await _context.SaveChangesAsync();       
+        }
+
     }
 }

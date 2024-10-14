@@ -11,5 +11,8 @@ namespace SirpoLR3Charter.Interfaces
         
         [OperationContract]
         Task<IEnumerable<Charter>> GetAllCharts();
+
+        [OperationContract]
+        Task DeleteCharter(Guid id);
     }
 }

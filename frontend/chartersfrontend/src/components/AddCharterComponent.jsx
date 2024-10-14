@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
-import { Box, Button, Input, FormControl, FormLabel, Heading } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Input, FormControl, FormLabel, Heading, useToast } from '@chakra-ui/react';
 import axios from 'axios';
 
 const AddCharterComponent = () => {
     const [citiesPath, setCitiesPath] = useState('');
     const [price, setPrice] = useState('');
-    const [date, setDate] = useState(new Date()); // Сохраняем как объект Date
+    const [date, setDate] = useState(''); // Храним дату как строку
+    const toast = useToast();
+
+    useEffect(() => {
+        const now = new Date();
+        const moscowTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
+        setDate(moscowTime.toISOString().slice(0, 16)); // Устанавливаем дату в формате 'YYYY-MM-DDTHH:mm'
+    }, []);
 
     const handleAddCharter = async () => {
-        const formattedDate = date.toISOString(); // Преобразуем дату в строку в формате ISO 8601
+        const localDate = new Date(date);
+        const moscowDate = new Date(localDate.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
+        const formattedDate = moscowDate.toISOString(); // Форматируем дату в ISO строку
 
         const soapRequest = `
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sir="http://tempuri.org/">
@@ -17,7 +26,7 @@ const AddCharterComponent = () => {
                     <sir:AddCharter>
                         <sir:citiesPath>${citiesPath}</sir:citiesPath>
                         <sir:Price>${price}</sir:Price>
-                        <sir:date>${formattedDate}</sir:date> <!-- Отправляем дату в формате ISO -->
+                        <sir:date>${formattedDate}</sir:date> <!-- Используем строку даты в формате ISO -->
                     </sir:AddCharter>
                 </soapenv:Body>
             </soapenv:Envelope>
@@ -32,10 +41,22 @@ const AddCharterComponent = () => {
             });
 
             console.log('Response:', response.data);
-            alert('Чартер успешно добавлен!');
+            toast({
+                title: 'Успех',
+                description: 'Чартер успешно добавлен!',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
         } catch (error) {
             console.error('Ошибка при добавлении чартерa:', error);
-            alert('Не удалось добавить чартер.');
+            toast({
+                title: 'Ошибка',
+                description: 'Не удалось добавить чартер.',
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
 
@@ -61,12 +82,11 @@ const AddCharterComponent = () => {
                 />
             </FormControl>
             <FormControl mb={3}>
-                <FormLabel>Дата (YYYY-MM-DD HH:mm:ss)</FormLabel>
+                <FormLabel>Дата и Время</FormLabel>
                 <Input 
-                    type="datetime-local" // Используем datetime-local для выбора даты и времени
-                    value={date.toISOString().slice(0, 16)} // Форматируем дату для поля ввода
-                    onChange={(e) => setDate(new Date(e.target.value))} // Сохраняем как объект Date
-                    placeholder="Введите дату"
+                    type="datetime-local" 
+                    value={date} // Используем строку даты напрямую
+                    onChange={(e) => setDate(e.target.value)} // Храним значение напрямую
                 />
             </FormControl>
             <Button colorScheme="teal" onClick={handleAddCharter}>Добавить Чартер</Button>
