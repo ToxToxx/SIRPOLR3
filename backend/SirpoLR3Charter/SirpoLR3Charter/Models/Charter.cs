@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace SirpoLR3Charter.Models
 {
@@ -12,7 +13,7 @@ namespace SirpoLR3Charter.Models
         [DataMember]
         public int Price { get; init; }
         [DataMember]
-        public DateTime CharterDateTime { get; init; }
+        public DateTime CharterDateTime { get; init; } 
         [DataMember]
         public DateTime CreatedAt { get; init; }
     }

@@ -2,6 +2,7 @@
 using SirpoLR3Charter.DataAccess;
 using SirpoLR3Charter.Interfaces;
 using SirpoLR3Charter.Models;
+using System.Globalization;
 
 namespace SirpoLR3Charter.Services
 {
@@ -14,14 +15,24 @@ namespace SirpoLR3Charter.Services
             _context = context;
         }
 
-        public async Task AddCharter(string citiesPath, int price, DateTime date)
+        public async Task AddCharter(string citiesPath, int price, string date)
         {
+            DateTime charterDateTime;
+
+            if (!DateTime.TryParse(date, out charterDateTime))
+            {
+                throw new ArgumentException("Invalid date format");
+            }
+
+
+            charterDateTime = DateTime.SpecifyKind(charterDateTime, DateTimeKind.Utc);
+
             var charter = new Charter()
             {
                 CititesPath = citiesPath,
                 Price = price,
-                CharterDateTime = date,
-                CreatedAt = DateTime.Now
+                CharterDateTime = charterDateTime, 
+                CreatedAt = DateTime.UtcNow 
             };
 
             _context.Charters.Add(charter);
@@ -32,5 +43,6 @@ namespace SirpoLR3Charter.Services
         {
             return await _context.Charters.ToListAsync();
         }
+    
     }
 }

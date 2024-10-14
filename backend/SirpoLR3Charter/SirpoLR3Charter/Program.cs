@@ -13,15 +13,15 @@ builder.Services.AddScoped<ChartersDbContext>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.WithOrigins("http://localhost:5173");
-        policy.AllowAnyHeader();
-        policy.AllowAnyMethod();
-    });
+    options.AddPolicy("AllowAll",
+             builder => builder
+                 .AllowAnyOrigin()
+                 .AllowAnyMethod()
+                 .AllowAnyHeader());
 });
 
 builder.Services.AddSoapCore();
+
 
 var app = builder.Build();
 
@@ -30,7 +30,7 @@ await using var dbContext = scope.ServiceProvider.GetRequiredService<ChartersDbC
 await dbContext.Database.EnsureCreatedAsync();
 
 app.UseRouting();
-app.UseCors();
+app.UseCors("AllowAll");
 
 app.UseSoapEndpoint<ICharterService>("/Service.asmx",
      new SoapEncoderOptions());
@@ -44,3 +44,4 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 
 app.Run();
+

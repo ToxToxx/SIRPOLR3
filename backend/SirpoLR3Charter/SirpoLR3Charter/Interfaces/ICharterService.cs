@@ -7,7 +7,7 @@ namespace SirpoLR3Charter.Interfaces
     public interface ICharterService
     {
         [OperationContract]
-        Task  AddCharter(string citiesPath, int Price, DateTime date);
+        Task  AddCharter(string citiesPath, int Price, string date);
         
         [OperationContract]
         Task<IEnumerable<Charter>> GetAllCharts();
