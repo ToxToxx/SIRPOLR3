@@ -1,18 +1,36 @@
-﻿using SirpoLR3Charter.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using SirpoLR3Charter.DataAccess;
+using SirpoLR3Charter.Interfaces;
 using SirpoLR3Charter.Models;
 
 namespace SirpoLR3Charter.Services
 {
     public class CharterService : ICharterService
     {
-        public Task AddCharter(string citiesPath, int Price, DateTime date)
+        private readonly ChartersDbContext _context;
+
+        public CharterService(ChartersDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task<IEnumerable<Charter>> GetAllCharts()
+        public async Task AddCharter(string citiesPath, int price, DateTime date)
         {
-            throw new NotImplementedException();
+            var charter = new Charter()
+            {
+                CititesPath = citiesPath,
+                Price = price,
+                CharterDateTime = date,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Charters.Add(charter);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Charter>> GetAllCharts()
+        {
+            return await _context.Charters.ToListAsync();
         }
     }
 }
