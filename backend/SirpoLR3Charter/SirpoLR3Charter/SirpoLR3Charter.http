@@ -1,0 +1,6 @@
+@SirpoLR3Charter_HostAddress = http://localhost:5018
+
+GET {{SirpoLR3Charter_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
