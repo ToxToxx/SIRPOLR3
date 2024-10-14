@@ -1,6 +1,18 @@
 import React, { useState } from 'react';
-import { Box, Button, Heading, UnorderedList, ListItem } from '@chakra-ui/react';
+import { Box, Button, Heading, SimpleGrid, Text, GridItem } from '@chakra-ui/react';
 import axios from 'axios';
+
+const formatDateTime = (dateTimeString) => {
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    };
+    return new Date(dateTimeString).toLocaleDateString('ru-RU', options);
+};
 
 const GetAllChartersComponent = () => {
     const [charters, setCharters] = useState([]);
@@ -25,8 +37,6 @@ const GetAllChartersComponent = () => {
 
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(response.data, 'text/xml');
-            
-            // Указываем пространство имен, использующееся в ответе
             const namespace = 'http://schemas.datacontract.org/2004/07/SirpoLR3Charter.Models';
             const charterNodes = xmlDoc.getElementsByTagNameNS(namespace, 'Charter');
 
@@ -40,7 +50,6 @@ const GetAllChartersComponent = () => {
                 citiesPath: node.getElementsByTagNameNS(namespace, 'CititesPath')[0]?.textContent || 'N/A',
                 price: node.getElementsByTagNameNS(namespace, 'Price')[0]?.textContent || 'N/A',
                 dateTime: node.getElementsByTagNameNS(namespace, 'CharterDateTime')[0]?.textContent || 'N/A',
-                createdAt: node.getElementsByTagNameNS(namespace, 'CreatedAt')[0]?.textContent || 'N/A',
             }));
 
             setCharters(chartersArray);
@@ -54,13 +63,17 @@ const GetAllChartersComponent = () => {
         <Box p={4} borderWidth={1} borderRadius="lg" boxShadow="lg">
             <Heading size="md" mb={4}>Список Чартеров</Heading>
             <Button colorScheme="teal" onClick={handleGetAllCharters} mb={4}>Получить Все Чартеры</Button>
-            <UnorderedList>
+            <SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} spacing={4}>
                 {charters.map((charter) => (
-                    <ListItem key={charter.id}>
-                        {charter.citiesPath} - {charter.price} - {charter.dateTime}
-                    </ListItem>
+                    <GridItem key={charter.id}>
+                        <Box borderWidth={1} borderRadius="md" boxShadow="md" p={4} bg="white">
+                            <Text fontWeight="bold" fontSize="lg">{charter.citiesPath}</Text>
+                            <Text mt={2}>Цена: {charter.price} руб.</Text>
+                            <Text mt={2}>Дата и Время: {formatDateTime(charter.dateTime)}</Text>
+                        </Box>
+                    </GridItem>
                 ))}
-            </UnorderedList>
+            </SimpleGrid>
         </Box>
     );
 };

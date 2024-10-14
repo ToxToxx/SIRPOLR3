@@ -1,23 +1,26 @@
+// AddCharterComponent.js
+
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Input, FormControl, FormLabel, Heading, useToast } from '@chakra-ui/react';
 import axios from 'axios';
+import { format, toZonedTime, fromZonedTime } from 'date-fns-tz';
 
 const AddCharterComponent = () => {
     const [citiesPath, setCitiesPath] = useState('');
     const [price, setPrice] = useState('');
-    const [date, setDate] = useState(''); // Храним дату как строку
+    const [date, setDate] = useState('');
     const toast = useToast();
+    const moscowTimeZone = 'Europe/Moscow';
 
     useEffect(() => {
         const now = new Date();
-        const moscowTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
-        setDate(moscowTime.toISOString().slice(0, 16)); // Устанавливаем дату в формате 'YYYY-MM-DDTHH:mm'
+        const moscowTime = toZonedTime(now, moscowTimeZone);
+        setDate(format(moscowTime, "yyyy-MM-dd'T'HH:mm")); // Format as 'YYYY-MM-DDTHH:mm'
     }, []);
 
     const handleAddCharter = async () => {
-        const localDate = new Date(date);
-        const moscowDate = new Date(localDate.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
-        const formattedDate = moscowDate.toISOString(); // Форматируем дату в ISO строку
+        const localDate = fromZonedTime(date, moscowTimeZone);
+        const formattedDate = localDate.toISOString();
 
         const soapRequest = `
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sir="http://tempuri.org/">
@@ -26,7 +29,7 @@ const AddCharterComponent = () => {
                     <sir:AddCharter>
                         <sir:citiesPath>${citiesPath}</sir:citiesPath>
                         <sir:Price>${price}</sir:Price>
-                        <sir:date>${formattedDate}</sir:date> <!-- Используем строку даты в формате ISO -->
+                        <sir:date>${formattedDate}</sir:date>
                     </sir:AddCharter>
                 </soapenv:Body>
             </soapenv:Envelope>
@@ -82,11 +85,11 @@ const AddCharterComponent = () => {
                 />
             </FormControl>
             <FormControl mb={3}>
-                <FormLabel>Дата и Время</FormLabel>
+                <FormLabel>Дата и Время (MSK)</FormLabel>
                 <Input 
                     type="datetime-local" 
-                    value={date} // Используем строку даты напрямую
-                    onChange={(e) => setDate(e.target.value)} // Храним значение напрямую
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
                 />
             </FormControl>
             <Button colorScheme="teal" onClick={handleAddCharter}>Добавить Чартер</Button>
