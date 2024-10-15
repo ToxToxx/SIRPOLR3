@@ -6,14 +6,12 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import AddCharterComponent from './components/AddCharterComponent';
 import CharterRemoveComponent from './components/CharterRemoveComponent';
 import GetAllChartersComponent from './components/GetAllChartersComponent';
-import EditCharterComponent from './components/EditCharterComponent';
 
 function CharterManagementComponent() {
     return (
         <Box>
             <AddCharterComponent />
             <CharterRemoveComponent />
-            <EditCharterComponent />
         </Box>
     );
 }
