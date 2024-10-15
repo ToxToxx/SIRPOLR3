@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Button, Heading, SimpleGrid, Text, GridItem } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Heading, SimpleGrid, Text, GridItem, Input } from '@chakra-ui/react';
 import axios from 'axios';
 
 const formatDateTime = (dateTimeString) => {
@@ -16,16 +16,17 @@ const formatDateTime = (dateTimeString) => {
 
 const GetAllChartersComponent = () => {
     const [charters, setCharters] = useState([]);
+    const [filteredCharters, setFilteredCharters] = useState([]);
+    const [searchTerm, setSearchTerm] = useState(''); // состояние для текста поиска
 
     const handleGetAllCharters = async () => {
-        const soapRequest = `
-            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sir="http://tempuri.org/">
+        const soapRequest = 
+            `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sir="http://tempuri.org/">
                 <soapenv:Header/>
                 <soapenv:Body>
                     <sir:GetAllCharts/>
                 </soapenv:Body>
-            </soapenv:Envelope>
-        `;
+            </soapenv:Envelope>`;
 
         try {
             const response = await axios.post('http://localhost:5018/Service.asmx', soapRequest, {
@@ -53,18 +54,35 @@ const GetAllChartersComponent = () => {
             }));
 
             setCharters(chartersArray);
+            setFilteredCharters(chartersArray); // Изначально показываем все
         } catch (error) {
             console.error('Ошибка при получении чартов:', error);
             alert('Не удалось получить чартеры.');
         }
     };
 
+    const handleSearchChange = (event) => {
+        const value = event.target.value;
+        setSearchTerm(value);
+        setFilteredCharters(
+            charters.filter(charter => 
+                charter.citiesPath.toLowerCase().includes(value.toLowerCase())
+            )
+        );
+    };
+
     return (
         <Box p={4} borderWidth={1} borderRadius="lg" boxShadow="lg">
             <Heading size="md" mb={4}>Список Чартеров</Heading>
             <Button colorScheme="teal" onClick={handleGetAllCharters} mb={4}>Получить Все Чартеры</Button>
+            <Input
+                placeholder="Поиск по городам"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                mb={4}
+            />
             <SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} spacing={4}>
-                {charters.map((charter) => (
+                {filteredCharters.map((charter) => (
                     <GridItem key={charter.id}>
                         <Box borderWidth={1} borderRadius="md" boxShadow="md" p={4} bg="white">
                             <Text fontWeight="bold" fontSize="lg">{charter.citiesPath}</Text>
