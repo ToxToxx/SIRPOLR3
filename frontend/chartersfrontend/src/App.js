@@ -10,8 +10,15 @@ import GetAllChartersComponent from './components/GetAllChartersComponent';
 function CharterManagementComponent() {
     return (
         <Box>
-            <AddCharterComponent />
-            <CharterRemoveComponent />
+            <Box mb={6}>
+                <GetAllChartersComponent />
+            </Box>
+            <Box mb={6}>
+                <AddCharterComponent />
+            </Box>
+            <Box mb={6}>
+                <CharterRemoveComponent />
+            </Box>
         </Box>
     );
 }
